@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# path where mullvad is kept
 PATH=/usr/local/bin:$PATH
 
 if command -v mullvad &> /dev/null; then
@@ -14,7 +15,7 @@ if command -v mullvad &> /dev/null; then
 
 else
   ICON=" "
-  OUTPUT="$PATH"
+  OUTPUT=""
 fi
 
 sketchybar --set "$NAME" icon="$ICON" label="$OUTPUT"

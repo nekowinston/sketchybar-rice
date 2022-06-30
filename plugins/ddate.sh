@@ -1,3 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-sketchybar --set "$NAME" label="$(ddate +'%{%A, %B %d%}%N%nCelebrate %H!')" icon=" "
+DATE="$(ddate +'%{%A, %b %d%}%N Celebrate %H!')"
+sketchybar --set "$NAME" label="$DATE" icon=" "

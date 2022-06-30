@@ -1,169 +1,208 @@
-# This is a demo config to show some of the most important commands more easily.
-# This is meant to be changed and configured, as it is intentionally kept
-# sparse.
-# For a more advanced configuration example see my dotfiles:
-# https://github.com/FelixKratz/SketchyBar/discussions/47#discussioncomment-2027233
-
+#!/usr/bin/env bash
+# vim:fileencoding=utf-8:foldmethod=marker
 PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
 
-##### Bar Appearance #####
-# Configuring the general appearance of the bar, these are only some of the
-# options available. For all options see:
-# https://felixkratz.github.io/SketchyBar/config/bar
-# If you are looking for other colors, see the color picker:
-# https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
+## functions and constants {{{
+# check wether or not macOS is in dark mode
+if [[ $(defaults read -g AppleInterfaceStyle) != 'Dark' ]]; then
+  THEME="light"
+else
+  THEME="dark"
+fi
 
-# Catppuccin Mocha colours
-ROSEWATER=0xfff5e0dc
-FLAMINGO=0xfff2cdcd
-PINK=0xfff5c2e7
-MAUVE=0xffcba6f7
-RED=0xfff38ba8
-MAROON=0xffeba0ac
-PEACH=0xfffab387
-YELLOW=0xfff9e2af
-GREEN=0xffa6e3a1
-TEAL=0xff94e2d5
-SKY=0xff89dceb
-SAPPHIRE=0xff74c7ec
-BLUE=0xff89b4fa
-LAVENDER=0xffb4befe
-TEXT=0xffcdd6f4
-SUBTEXT1=0xffbac2de
-SUBTEXT0=0xffa6adc8
-OVERLAY2=0xff9399b2
-OVERLAY1=0xff7f849c
-OVERLAY0=0xff6c7086
-SURFACE2=0xff585b70
-SURFACE1=0xff45475a
-SURFACE0=0xff313244
-BASE=0xff1e1e2e
-MANTLE=0xff181825
-CRUST=0xff11111b
+# super quick full restart of sketchybar
+quick_restart() {
+  launchctl kickstart -k "gui/${UID}/homebrew.mxcl.sketchybar"
+}
 
-sketchybar --bar height=32        \
-                 blur_radius=10   \
-                 position=top     \
-                 padding_left=10  \
-                 padding_right=10 \
-                 color=${CRUST}
+# catppuccin Mocha colours {{{
+if [[ $THEME == 'dark' ]]; then
+  ROSEWATER=0xfff5e0dc
+  FLAMINGO=0xfff2cdcd
+  PINK=0xfff5c2e7
+  MAUVE=0xffcba6f7
+  RED=0xfff38ba8
+  MAROON=0xffeba0ac
+  PEACH=0xfffab387
+  YELLOW=0xfff9e2af
+  GREEN=0xffa6e3a1
+  TEAL=0xff94e2d5
+  SKY=0xff89dceb
+  SAPPHIRE=0xff74c7ec
+  BLUE=0xff89b4fa
+  LAVENDER=0xffb4befe
+  TEXT=0xffcdd6f4
+  SUBTEXT1=0xffbac2de
+  SUBTEXT0=0xffa6adc8
+  OVERLAY2=0xff9399b2
+  OVERLAY1=0xff7f849c
+  OVERLAY0=0xff6c7086
+  SURFACE2=0xff585b70
+  SURFACE1=0xff45475a
+  SURFACE0=0xff313244
+  BASE=0xff1e1e2e
+  MANTLE=0xff181825
+  CRUST=0xff11111b
+else
+  ROSEWATER=0xffdc8a78
+  FLAMINGO=0xffdd7878
+  PINK=0xffea76cb
+  MAUVE=0xff8839ef
+  RED=0xffd20f39
+  MAROON=0xffe64553
+  PEACH=0xfffe640b
+  YELLOW=0xffdf8e1d
+  GREEN=0xff40a02b
+  TEAL=0xff179299
+  SKY=0xff04a5e5
+  SAPPHIRE=0xff209fb5
+  BLUE=0xff1e66f5
+  LAVENDER=0xff7287fd
+  TEXT=0xff4c4f69
+  SUBTEXT1=0xff5c5f77
+  SUBTEXT0=0xff6c6f85
+  OVERLAY2=0xff7c7f93
+  OVERLAY1=0xff8c8fa1
+  OVERLAY0=0xff9ca0b0
+  SURFACE2=0xffacb0be
+  SURFACE1=0xffbcc0cc
+  SURFACE0=0xffccd0da
+  CRUST=0xffdce0e8
+  MANTLE=0xffe6e9ef
+  BASE=0xffeff1f5
+fi
+# }}}
+## }}}
 
+## bar appearance {{{
+sketchybar -m --add event theme_changed AppleInterfaceThemeChangedNotification
+
+sketchybar --bar \
+  height=32 \
+  blur_radius=0 \
+  position=top \
+  padding_left=0 \
+  padding_right=4 \
+  color=${CRUST}
 
 ##### Changing Defaults #####
 # We now change some default values that are applied to all further items
 # For a full list of all available item properties see:
 # https://felixkratz.github.io/SketchyBar/config/items
 
-sketchybar --default updates=when_shown                         \
-                     drawing=on                                 \
-                     icon.font="Symbols Nerd Font:2048-em:17.0" \
-                     icon.color=${SURFACE2}                     \
-                     label.font="SF Pro:Bold:14.0"              \
-                     label.color=${PINK}                        \
-                     label.padding_left=1                       \
-                     label.padding_right=1                      \
-                     icon.padding_left=8                        \
-                     icon.padding_right=8
+sketchybar --default \
+  updates=when_shown \
+  drawing=on \
+  icon.font="Symbols Nerd Font:2048-em:17.0" \
+  icon.color=${PINK} \
+  label.font="SF Pro:Bold:14.0" \
+  label.color=${TEXT} \
+  label.padding_left=1 \
+  label.padding_right=1 \
+  icon.padding_left=8 \
+  icon.padding_right=8
+# }}}
 
-##### Adding Mission Control Space Indicators #####
-# Now we add some mission control spaces:
-# https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
-# to indicate active and available mission control spaces
+## left side of the bar {{{
 
+# spaces for yabai wm
 SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
-
 for i in "${!SPACE_ICONS[@]}"
 do
-  sketchybar --add space space.$i left                                     \
-             --set space.$i associated_space=$(($i+1))                     \
-                            icon=${SPACE_ICONS[i]}                         \
-                            icon.highlight_color=${PINK}              \
-                            icon.padding_left=8                            \
-                            icon.padding_right=8                           \
-                            background.padding_left=1                      \
-                            background.padding_right=1                     \
-                            background.color=${OVERLAY0}                       \
-                            background.height=32                           \
-                            label.drawing=off                              \
-                            script="$PLUGIN_DIR/space.sh"                  \
-                            click_script="yabai -m space --focus $(($i+1))"
+  if [[ $i == 0 ]]; then
+    lbgp=0
+  else
+    lbgp=1
+  fi
+
+  sketchybar \
+    --add space "space.$i" left \
+    --set "space.$i" associated_space=$(($i+1)) \
+      icon="${SPACE_ICONS[i]}" \
+      icon.highlight_color=${PINK} \
+      icon.padding_left=8 \
+      icon.padding_right=8 \
+      background.padding_left="$lbgp" \
+      background.padding_right=1 \
+      background.color=${OVERLAY0} \
+      background.height=32 \
+      label.drawing=off \
+      script="$PLUGIN_DIR/space.sh" \
+      click_script="yabai -m space --focus $(($i+1))"
 done
 
-##### Adding Left Items #####
-# We add some regular items to the left side of the bar
-# only the properties deviating from the current defaults need to be set
-
+# window title
 sketchybar \
---add item space_separator left \
---set space_separator icon= \
-  background.padding_left=15 \
-  background.padding_right=15 \
-  label.drawing=off \
-\
---add item window_title left \
---set window_title \
-  script="$PLUGIN_DIR/window_title.sh" \
-  icon.drawing=off \
---subscribe window_title front_app_switched
+  --add item window_title left \
+  --set window_title \
+    background.padding_left=8 \
+    script="$PLUGIN_DIR/window_title.sh" \
+    icon.drawing=off \
+  --subscribe window_title front_app_switched
 
+## }}}
 
-##### Middle Music Item #####
+## middle of the bar {{{
+
+# Apple Music Status
 sketchybar -m --add event song_update com.apple.Music.playerInfo
-
 sketchybar \
---add item music center                \
---set music                            \
-icon.color=${SUBTEXT1}                 \
-label.color=${SUBTEXT1}                \
-script="$PLUGIN_DIR/music.sh"          \
+--add item music center \
+--set music \
+  icon.color=${SUBTEXT1} \
+  label.color=${SUBTEXT1} \
+  script="$PLUGIN_DIR/music.sh" \
 --subscribe music song_update
+# }}}
 
-##### Adding Right Items #####
+## right side of the bar {{{
+
+# this starts at the rightmost item
+# items should be self explanatory by their name, and are separated by a blank line
 sketchybar \
---add item clock right                 \
---set clock                            \
-script="$PLUGIN_DIR/clock.sh"          \
-update_freq=10                         \
-icon.color=${MAUVE}                    \
-label.color=${MAUVE}                   \
 \
---add item date right                  \
---set date                             \
-script="$PLUGIN_DIR/ddate.sh"          \
-update_freq=30                         \
-icon.color=${BLUE}                     \
-label.color=${BLUE}                    \
+  --add item clock right \
+  --set clock \
+    script="$PLUGIN_DIR/clock.sh" \
+    update_freq=10 \
+    icon.color=${MAUVE} \
+    label.color=${MAUVE} \
 \
---add item mullvad right               \
---set mullvad                          \
-script="$PLUGIN_DIR/mullvad.sh"        \
-update_freq=10                         \
-icon.color=${GREEN}                    \
-label.color=${GREEN}                   \
+  --add item date right \
+  --set date \
+    script="$PLUGIN_DIR/ddate.sh" \
+    icon.color=${BLUE} \
+    label.color=${BLUE} \
+  --subscribe date mouse.clicked \
 \
---add item battery right               \
---set battery                          \
-update_freq=30                         \
-script="$PLUGIN_DIR/battery.sh"        \
-icon.color=${YELLOW}                   \
-label.color=${YELLOW}                  \
---subscribe battery system_woke        \
+  --add item mullvad right \
+  --set mullvad \
+    script="$PLUGIN_DIR/mullvad.sh" \
+    update_freq=10 \
+    icon.color=${GREEN} \
+    label.color=${GREEN} \
 \
---add item sound right                 \
---set sound                            \
-script="$PLUGIN_DIR/sound.sh"          \
-update_freq=5                          \
-icon.color=${PEACH}                    \
-label.color=${PEACH}                   \
+  --add item battery right \
+  --set battery \
+    update_freq=30 \
+    script="$PLUGIN_DIR/battery.sh" \
+    icon.color=${YELLOW} \
+    label.color=${YELLOW} \
+  --subscribe battery system_woke \
 \
---add item mail right                  \
---set mail                             \
-script="$PLUGIN_DIR/mailIndicator.sh"  \
-update_freq=10                         \
-icon.color=${RED}                      \
-label.color=${RED}
+  --add item sound right \
+  --set sound \
+    script="$PLUGIN_DIR/sound.sh" \
+    update_freq=5 \
+    icon.color=${PEACH} \
+    label.color=${PEACH} \
+\
+  --add item mail right \
+  --set mail \
+    script="$PLUGIN_DIR/mailIndicator.sh" \
+    update_freq=10 \
+    icon.color=${RED} \
+    label.color=${RED}
 
-##### Finalizing Setup #####
+##### fin #####
 sketchybar --update
-
-echo "sketchybar configuration loaded.."

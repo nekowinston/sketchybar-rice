@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-UNREAD_ONLY=false
+UNREAD_ONLY=true
 MAIL_DIR=~/.local/share/mail
 
 COUNT=0
@@ -8,20 +8,24 @@ COUNT=0
 if [[ -d ${MAIL_DIR} ]]; then
   for dir in "${MAIL_DIR}"/*/; do
     # get file count for the unread mailbox, add to count
-    COUNT=$(( $( ls ${dir}INBOX/new | wc -l ) + $COUNT ))
+    unreads=$( find "${dir}INBOX/new" | wc -l)
+    COUNT=$((COUNT+unreads))
 
     # also add the rest of the inbox if var is set
     if ! ($UNREAD_ONLY); then
-      COUNT=$(( $( ls ${dir}INBOX/cur | wc -l ) + $COUNT ))
+      other=$( find "${dir}INBOX/new" | wc -l)
+      COUNT=$((COUNT+other))
     fi
 
   done
 fi
 
-if [[ $mailcount -gt 0 ]]; then
-  ICON=" "
+if [[ $COUNT -gt 0 ]]; then
+  ICON=" "
+  LABEL="$COUNT"
 else
-  ICON=" "
+  ICON=" "
+  LABEL="Inbox Zero!"
 fi
 
-sketchybar --set "$NAME" label="$COUNT" icon="$ICON"
+sketchybar --set "$NAME" label="$LABEL" icon="$ICON"

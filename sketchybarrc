@@ -10,80 +10,119 @@ else
   THEME="dark"
 fi
 
-# super quick full restart of sketchybar
-quick_restart() {
-  launchctl kickstart -k "gui/${UID}/homebrew.mxcl.sketchybar"
-}
-
 # catppuccin Mocha colours {{{
 if [[ $THEME == 'dark' ]]; then
-  ROSEWATER=0xfff5e0dc
-  FLAMINGO=0xfff2cdcd
-  PINK=0xfff5c2e7
-  MAUVE=0xffcba6f7
-  RED=0xfff38ba8
-  MAROON=0xffeba0ac
-  PEACH=0xfffab387
-  YELLOW=0xfff9e2af
-  GREEN=0xffa6e3a1
-  TEAL=0xff94e2d5
-  SKY=0xff89dceb
-  SAPPHIRE=0xff74c7ec
-  BLUE=0xff89b4fa
-  LAVENDER=0xffb4befe
-  TEXT=0xffcdd6f4
-  SUBTEXT1=0xffbac2de
-  SUBTEXT0=0xffa6adc8
-  OVERLAY2=0xff9399b2
-  OVERLAY1=0xff7f849c
-  OVERLAY0=0xff6c7086
-  SURFACE2=0xff585b70
-  SURFACE1=0xff45475a
-  SURFACE0=0xff313244
-  BASE=0xff1e1e2e
-  MANTLE=0xff181825
-  CRUST=0xff11111b
+  ROSEWATER="f5e0dc"
+  FLAMINGO="f2cdcd"
+  PINK="f5c2e7"
+  MAUVE="cba6f7"
+  RED="0xfff38ba8"
+  MAROON="eba0ac"
+  PEACH="fab387"
+  YELLOW="f9e2af"
+  GREEN="a6e3a1"
+  TEAL="94e2d5"
+  SKY="89dceb"
+  SAPPHIRE="74c7ec"
+  BLUE="89b4fa"
+  LAVENDER="b4befe"
+  TEXT="cdd6f4"
+  SUBTEXT1="bac2de"
+  SUBTEXT0="a6adc8"
+  OVERLAY2="9399b2"
+  OVERLAY1="7f849c"
+  OVERLAY0="6c7086"
+  SURFACE2="585b70"
+  SURFACE1="45475a"
+  SURFACE0="313244"
+  BASE="1e1e2e"
+  MANTLE="181825"
+  CRUST="11111b"
 else
-  ROSEWATER=0xffdc8a78
-  FLAMINGO=0xffdd7878
-  PINK=0xffea76cb
-  MAUVE=0xff8839ef
-  RED=0xffd20f39
-  MAROON=0xffe64553
-  PEACH=0xfffe640b
-  YELLOW=0xffdf8e1d
-  GREEN=0xff40a02b
-  TEAL=0xff179299
-  SKY=0xff04a5e5
-  SAPPHIRE=0xff209fb5
-  BLUE=0xff1e66f5
-  LAVENDER=0xff7287fd
-  TEXT=0xff4c4f69
-  SUBTEXT1=0xff5c5f77
-  SUBTEXT0=0xff6c6f85
-  OVERLAY2=0xff7c7f93
-  OVERLAY1=0xff8c8fa1
-  OVERLAY0=0xff9ca0b0
-  SURFACE2=0xffacb0be
-  SURFACE1=0xffbcc0cc
-  SURFACE0=0xffccd0da
-  CRUST=0xffdce0e8
-  MANTLE=0xffe6e9ef
-  BASE=0xffeff1f5
+  ROSEWATER="dc8a78"
+  FLAMINGO="dd7878"
+  PINK="ea76cb"
+  MAUVE="8839ef"
+  RED="d20f39"
+  MAROON="e64553"
+  PEACH="fe640b"
+  YELLOW="df8e1d"
+  GREEN="40a02b"
+  TEAL="179299"
+  SKY="04a5e5"
+  SAPPHIRE="209fb5"
+  BLUE="1e66f5"
+  LAVENDER="7287fd"
+  TEXT="4c4f69"
+  SUBTEXT1="5c5f77"
+  SUBTEXT0="6c6f85"
+  OVERLAY2="7c7f93"
+  OVERLAY1="8c8fa1"
+  OVERLAY0="9ca0b0"
+  SURFACE2="acb0be"
+  SURFACE1="bcc0cc"
+  SURFACE0="ccd0da"
+  CRUST="dce0e8"
+  MANTLE="e6e9ef"
+  BASE="eff1f5"
 fi
+
+function color() {
+  alpha=${2:-255}
+  color="$1"
+
+  case $1 in
+    rosewater) color=$ROSEWATER ;;
+    flamingo) color=$FLAMINGO ;;
+    pink) color=$PINK ;;
+    mauve) color=$MAUVE ;;
+    red) color=$RED ;;
+    maroon) color=$MAROON ;;
+    peach) color=$PEACH ;;
+    yellow) color=$YELLOW ;;
+    green) color=$GREEN ;;
+    teal) color=$TEAL ;;
+    sky) color=$SKY ;;
+    sapphire) color=$SAPPHIRE ;;
+    blue) color=$BLUE ;;
+    lavender) color=$LAVENDER ;;
+    text) color=$TEXT ;;
+    subtext1) color=$SUBTEXT1 ;;
+    subtext0) color=$SUBTEXT0 ;;
+    overlay2) color=$OVERLAY2 ;;
+    overlay1) color=$OVERLAY1 ;;
+    overlay0) color=$OVERLAY0 ;;
+    surface2) color=$SURFACE2 ;;
+    surface1) color=$SURFACE1 ;;
+    surface0) color=$SURFACE0 ;;
+    crust) color=$CRUST ;;
+    mantle) color=$MANTLE ;;
+    base) color=$BASE ;;
+    *) color=$BASE ;;
+  esac
+  printf -v alpha "%02x" "$alpha"
+  echo "0x${alpha}${color}"
+}
 # }}}
 ## }}}
 
 ## bar appearance {{{
-sketchybar -m --add event theme_changed AppleInterfaceThemeChangedNotification
-
 sketchybar --bar \
   height=32 \
-  blur_radius=0 \
+  blur_radius=10 \
   position=top \
   padding_left=0 \
   padding_right=4 \
-  color=${CRUST}
+  color=$(color crust 200)
+
+sketchybar -m --add event theme_changed AppleInterfaceThemeChangedNotification
+sketchybar \
+  --add item dummy left \
+  --set dummy \
+    icon.drawing=off \
+    label.drawing=off \
+    script="$PLUGIN_DIR/kickstart.sh" \
+  --subscribe dummy theme_changed
 
 ##### Changing Defaults #####
 # We now change some default values that are applied to all further items
@@ -93,10 +132,10 @@ sketchybar --bar \
 sketchybar --default \
   updates=when_shown \
   drawing=on \
-  icon.font="Symbols Nerd Font:2048-em:17.0" \
-  icon.color=${PINK} \
-  label.font="SF Pro:Bold:14.0" \
-  label.color=${TEXT} \
+  icon.font="Symbols Nerd Font:2048-em:18.0" \
+  icon.color=$(color pink) \
+  label.font="Victor Mono:Bold:16.0" \
+  label.color=$(color text) \
   label.padding_left=1 \
   label.padding_right=1 \
   icon.padding_left=8 \
@@ -106,7 +145,18 @@ sketchybar --default \
 ## left side of the bar {{{
 
 # spaces for yabai wm
-SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+SPACE_ICONS=(
+" "
+" "
+" "
+" "
+" "
+" "
+" "
+" "
+" "
+" "
+)
 for i in "${!SPACE_ICONS[@]}"
 do
   if [[ $i == 0 ]]; then
@@ -119,12 +169,12 @@ do
     --add space "space.$i" left \
     --set "space.$i" associated_space=$(($i+1)) \
       icon="${SPACE_ICONS[i]}" \
-      icon.highlight_color=${PINK} \
+      icon.highlight_color=$(color pink) \
       icon.padding_left=8 \
       icon.padding_right=8 \
       background.padding_left="$lbgp" \
       background.padding_right=1 \
-      background.color=${OVERLAY0} \
+      background.color=$(color overlay2) \
       background.height=32 \
       label.drawing=off \
       script="$PLUGIN_DIR/space.sh" \
@@ -135,9 +185,10 @@ done
 sketchybar \
   --add item window_title left \
   --set window_title \
+    icon.color=$(color text) \
+    label.color=$(color text) \
     background.padding_left=8 \
     script="$PLUGIN_DIR/window_title.sh" \
-    icon.drawing=off \
   --subscribe window_title front_app_switched
 
 ## }}}
@@ -149,8 +200,9 @@ sketchybar -m --add event song_update com.apple.Music.playerInfo
 sketchybar \
 --add item music center \
 --set music \
-  icon.color=${SUBTEXT1} \
-  label.color=${SUBTEXT1} \
+  icon.color=$(color subtext1) \
+  label.color=$(color subtext1) \
+  label.font="Victor Mono:Bold Italic:16.0" \
   script="$PLUGIN_DIR/music.sh" \
 --subscribe music song_update
 # }}}
@@ -165,44 +217,50 @@ sketchybar \
   --set clock \
     script="$PLUGIN_DIR/clock.sh" \
     update_freq=10 \
-    icon.color=${MAUVE} \
-    label.color=${MAUVE} \
+    icon.color=$(color mauve) \
+    label.color=$(color mauve) \
 \
   --add item date right \
   --set date \
     script="$PLUGIN_DIR/ddate.sh" \
-    icon.color=${BLUE} \
-    label.color=${BLUE} \
-  --subscribe date mouse.clicked \
+    icon.color=$(color blue) \
+    label.color=$(color blue) \
 \
   --add item mullvad right \
   --set mullvad \
     script="$PLUGIN_DIR/mullvad.sh" \
     update_freq=10 \
-    icon.color=${GREEN} \
-    label.color=${GREEN} \
+    icon.color=$(color green) \
+    label.color=$(color green) \
 \
   --add item battery right \
   --set battery \
     update_freq=30 \
     script="$PLUGIN_DIR/battery.sh" \
-    icon.color=${YELLOW} \
-    label.color=${YELLOW} \
+    icon.color=$(color yellow) \
+    label.color=$(color yellow) \
   --subscribe battery system_woke \
 \
   --add item sound right \
   --set sound \
     script="$PLUGIN_DIR/sound.sh" \
     update_freq=5 \
-    icon.color=${PEACH} \
-    label.color=${PEACH} \
+    icon.color=$(color peach) \
+    label.color=$(color peach) \
 \
   --add item mail right \
   --set mail \
     script="$PLUGIN_DIR/mailIndicator.sh" \
     update_freq=10 \
-    icon.color=${RED} \
-    label.color=${RED}
+    icon.color=$(color red) \
+    label.color=$(color red) \
+\
+  --add item tasks right \
+  --set tasks \
+    script="$PLUGIN_DIR/tasks.sh" \
+    update_freq=10 \
+    icon.color=$(color red) \
+    label.color=$(color red)
 
 ##### fin #####
 sketchybar --update

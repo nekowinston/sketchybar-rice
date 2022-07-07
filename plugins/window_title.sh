@@ -1,3 +1,10 @@
 #!/usr/bin/env sh
 
-sketchybar --set $NAME label="$INFO"
+case "$INFO" in
+  "WezTerm")
+    ICON=" ";;
+  *)
+    ICON="";;
+esac
+
+sketchybar --set "$NAME" label="$INFO" icon="$ICON"

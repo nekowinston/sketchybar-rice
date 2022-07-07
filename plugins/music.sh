@@ -1,23 +1,22 @@
 #!/usr/bin/env sh
 
-STATE=$(osascript -e 'tell application "Music" to player state as string' 2>/dev/null || echo "stopped")
-TRACK=$(osascript -e 'tell application "Music" to name of current track as string' 2>/dev/null || echo "unknown track")
-ARTIST=$(osascript -e 'tell application "Music" to artist of current track as string' 2>/dev/null || echo "unknown artist")
+if pgrep -xq Music; then
+  STATE=$(osascript -e 'tell application "Music" to player state as string' 2>/dev/null || echo "")
+  TRACK=$(osascript -e 'tell application "Music" to name of current track as string' 2>/dev/null || echo "")
+  ARTIST=$(osascript -e 'tell application "Music" to album artist of current track as string' 2>/dev/null || echo "")
 
-togglePlay() {
   if [ "$STATE" = "playing" ]; then
-    osascript -e 'tell application "Music" to pause'
+    ICON=""
+    LABEL="$ARTIST - $TRACK"
   else
-    osascript -e 'tell application "Music" to play'
+    ICON=""
+    if [ "$TRACK" = "" ] || [ "$ARTIST" = "" ]; then
+      LABEL="paused"
+    else
+      LABEL="$ARTIST - $TRACK"
+    fi
   fi
-}
-
-if [ "$STATE" = "playing" ]; then
-  ICON=""
-  OUTPUT="$ARTIST - $TRACK"
+  sketchybar --set "$NAME" icon="$ICON" label="$LABEL" --add event "${NAME}-changed"
 else
-  ICON=""
-  OUTPUT="Paused"
+  sketchybar --set "$NAME" icon="" label="" --add event "${NAME}-changed"
 fi
-
-sketchybar --set "$NAME" icon="$ICON" label="$OUTPUT" --add event "${NAME}-changed"

@@ -20,7 +20,7 @@ case ${PERCENTAGE} in
 esac
 
 if [[ "$CHARGING" != "" ]]; then
-  ICON=""
+  ICON="⚡"
 fi
 
 sketchybar --set battery icon="$ICON" label="${PERCENTAGE}%"
